@@ -18,11 +18,17 @@ jobs:
     steps:
       # Checkout the code as the first step.
       - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
       # Use mvn clean and package as the standard maven build phase
       # Then run your tests!
       - run:
           name: Test
-          command: mvn test -T 2C -Dmaven.test.failure.ignore=true --fail-at-end -DfailIfNoTests=false 
+          command: mvn test  -Dmaven.test.failure.ignore=true --fail-at-end -DfailIfNoTests=false 
       - run:
           name: Save test results
           command: |
@@ -31,7 +37,10 @@ jobs:
           when: always      
       - store_test_results:
           path: ~/test-results  
-
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
