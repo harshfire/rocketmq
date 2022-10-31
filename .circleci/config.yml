@@ -18,6 +18,12 @@ jobs:
     steps:
       # Checkout the code as the first step.
       - checkout
+      
+      # Get Download time for maven dependencies
+      - run:
+          name: DownloadDependencies
+          command: mvn dependency:copy-dependencies -DoutputDirectory=~/deps-downloaded
+
       # Use mvn clean and package as the standard maven build phase
       # Then run your tests!
       - run:
